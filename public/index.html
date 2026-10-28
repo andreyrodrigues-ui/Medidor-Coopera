@@ -3,26 +3,181 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medidor Coopera</title>
+  <meta name="description" content="Simule o consumo de energia da sua casa com o Medidor Coopera.">
+  <title>Medidor Coopera | Consumo de energia</title>
   <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
 </head>
 <body>
-  <h1>Medidor Coopera</h1>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Medidor Coopera - início">
+      <span class="brand-mark" aria-hidden="true">⚡</span>
+      <span>medidor<span class="brand-accent">coopera</span></span>
+    </a>
+    <span class="topbar-label"><span class="status-dot"></span> Simulador de energia</span>
+  </header>
 
-  <form id="form-aparelho">
-    <input type="text" id="nome" placeholder="Nome do aparelho" required>
-    <input type="number" id="potencia" placeholder="Potência (W)" required>
-    <input type="number" id="horas" placeholder="Horas por dia" step="0.1" required>
-    <input type="number" id="dias" placeholder="Dias no mês" required>
-    <button type="submit">Adicionar aparelho</button>
-  </form>
+  <main class="container">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">COOPERA LUZ · ENERGIA CONSCIENTE</p>
+        <h1>Entenda sua conta.<br><span>Economize energia.</span></h1>
+        <p class="hero-description">Cadastre os aparelhos da sua casa e simule o consumo mensal, o custo estimado e a quantidade de painéis solares necessários.</p>
+      </div>
+      <div class="hero-icon" aria-hidden="true">
+        <span class="sun">☀</span>
+        <span class="solar-panel">▦</span>
+        <span class="bolt">ϟ</span>
+      </div>
+    </section>
 
-  <ul id="lista-aparelhos"></ul>
+    <section class="workspace" aria-label="Simulador de consumo">
+      <div class="panel form-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">ETAPA 01</p>
+            <h2>Seus aparelhos</h2>
+          </div>
+          <span class="step-number">01</span>
+        </div>
+        <p class="section-description">Informe os dados de cada aparelho que deseja incluir na simulação.</p>
 
-  <button id="btn-simular">Simular</button>
+        <form id="form-aparelho">
+          <div class="field">
+            <label for="nome">Nome do aparelho</label>
+            <input id="nome" name="nome" type="text" placeholder="Ex.: Geladeira" required maxlength="80">
+          </div>
 
-  <div id="resultado"></div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="potenciaW">Potência (W)</label>
+              <input id="potenciaW" name="potenciaW" type="number" min="1" max="10000" step="any" placeholder="150" required>
+            </div>
+            <div class="field">
+              <label for="horasDia">Horas por dia</label>
+              <input id="horasDia" name="horasDia" type="number" min="0" max="24" step="any" placeholder="8" required>
+            </div>
+          </div>
 
-  <script src="app.js"></script>
+          <div class="field">
+            <label for="diasMes">Dias de uso no mês</label>
+            <input id="diasMes" name="diasMes" type="number" min="1" max="31" step="1" value="30" required>
+            <span class="field-hint">Escolha de 1 a 31 dias.</span>
+          </div>
+
+          <button class="button button-primary button-full" type="submit">
+            <span aria-hidden="true">＋</span> Adicionar aparelho
+          </button>
+        </form>
+
+        <div class="list-heading">
+          <h3>Lista de aparelhos</h3>
+          <span id="contador-aparelhos" class="count-badge">0</span>
+        </div>
+        <ul id="lista-aparelhos" class="appliance-list" aria-live="polite">
+          <li class="empty-state">Nenhum aparelho adicionado ainda.</li>
+        </ul>
+
+        <button id="btn-simular" class="button button-dark button-full" type="button">
+          Simular consumo <span aria-hidden="true">→</span>
+        </button>
+        <p id="mensagem-erro" class="message message-error" role="alert" hidden></p>
+        <p id="mensagem-status" class="message message-status" role="status" aria-live="polite"></p>
+      </div>
+
+      <div class="results-column">
+        <section class="panel results-panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">ETAPA 02</p>
+              <h2>Resumo da simulação</h2>
+            </div>
+            <span class="step-number">02</span>
+          </div>
+          <p class="section-description">Os resultados serão preenchidos com os dados calculados pelo servidor.</p>
+
+          <div id="resultado-vazio" class="results-empty">
+            <div class="empty-illustration" aria-hidden="true">↗</div>
+            <h3>Sua simulação aparecerá aqui</h3>
+            <p>Adicione os aparelhos e clique em “Simular consumo” para consultar os resultados.</p>
+          </div>
+
+          <div id="resultado" hidden>
+            <div class="main-result">
+              <span class="result-label">Valor estimado da conta</span>
+              <strong id="total-mes" class="main-price">—</strong>
+              <span class="result-footnote">Energia + adicional da bandeira</span>
+            </div>
+
+            <div class="metric-grid">
+              <article class="metric-card">
+                <span class="metric-icon" aria-hidden="true">ϟ</span>
+                <span class="metric-label">Consumo mensal</span>
+                <strong id="consumo-total">—</strong>
+                <span class="metric-unit">kWh / mês</span>
+              </article>
+              <article class="metric-card">
+                <span class="metric-icon solar-icon" aria-hidden="true">☀</span>
+                <span class="metric-label">Painéis necessários</span>
+                <strong id="paineis-necessarios">—</strong>
+                <span class="metric-unit">painéis solares</span>
+              </article>
+            </div>
+
+            <div class="expensive-appliance">
+              <span class="expensive-icon" aria-hidden="true">↗</span>
+              <div>
+                <span class="result-label">Aparelho que mais pesa no bolso</span>
+                <strong id="aparelho-mais-caro">—</strong>
+                <span id="custo-mais-caro" class="expensive-cost">—</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel details-panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">DETALHAMENTO</p>
+              <h2>Consumo por aparelho</h2>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Aparelho</th>
+                  <th scope="col">Consumo</th>
+                  <th scope="col">Custo</th>
+                  <th scope="col">Participação</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-detalhes">
+                <tr class="table-empty">
+                  <td colspan="4">Os detalhes aparecerão após a simulação.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <aside class="tip-banner">
+      <span class="tip-icon" aria-hidden="true">✦</span>
+      <div>
+        <strong>Pequenas mudanças fazem diferença.</strong>
+        <p>Conhecer o consumo dos aparelhos ajuda a identificar oportunidades para usar energia com mais consciência.</p>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <a class="brand footer-brand" href="#">
+      <span class="brand-mark" aria-hidden="true">⚡</span>
+      <span>medidor<span class="brand-accent">coopera</span></span>
+    </a>
+    <p>Projeto acadêmico · Simulador de consumo de energia</p>
+  </footer>
 </body>
 </html>
